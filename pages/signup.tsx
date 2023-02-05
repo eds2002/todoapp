@@ -2,6 +2,24 @@ import Button from '@/components/Button'
 import Layout from '@/components/Layout'
 import Text from '@/components/Text'
 import React, { useEffect, useState } from 'react'
+import supabase from '@/utils/supabase'
+import bcrypt from 'bcryptjs'
+
+async function insertUser(
+  firstName: string,
+  lastName: string,
+  nickname: string,
+  email: string,
+  password: string,
+) {
+  return await supabase.from('user').insert({
+    first_name: firstName,
+    last_name: lastName,
+    nickname,
+    email,
+    password,
+  })
+}
 
 export default function Signup() {
   return (
@@ -88,9 +106,23 @@ function Form() {
       error: false,
     },
   ])
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (inputs.some(input => input.error)) return //If any error inputs are true, return
+
+    const { status, error } = await insertUser(
+      inputData.firstName,
+      inputData.lastName,
+      inputData.nickname,
+      inputData.email,
+      bcrypt.hashSync(inputData.password, 10),
+    )
+
+    if (error) {
+      alert('Error in creating a user, please try again.')
+    } else {
+      console.log('success')
+    }
   }
 
   const onChange = (name: string, val: string) => {
