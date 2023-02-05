@@ -17,13 +17,13 @@ export default function Signup() {
               type="h1"
               className="text-5xl"
             >
-              Sign Up
+              Sign In
             </Text>
             <Text
               type="p"
               className="text-lg mt-2 w-[30ch] font-medium opacity-50"
             >
-              Start managing the important. Sign up today, all for free.
+              Welcome back, let&apos;s get you back in.
             </Text>
           </div>
           <Form />
@@ -38,83 +38,63 @@ function Form() {
   const [inputs, setInputs] = useState([
     {
       id: 1,
-      type: 'text',
-      label: 'First Name',
-      name: 'firstName',
-      placeHolder: 'First Name',
-      required: true,
-      error: false,
-    },
-    {
-      id: 2,
-      type: 'text',
-      label: 'Last Name',
-      name: 'lastName',
-      placeHolder: 'Last Name',
-      required: true,
-      error: false,
-    },
-    {
-      id: 3,
-      type: 'text',
-      label: 'Nickname',
-      name: 'nickname',
-      placeHolder: 'Nickname (optional)',
-      required: false,
-      error: false,
-    },
-    {
-      id: 4,
       type: 'email',
       label: 'Email',
       name: 'email',
-      placeHolder: 'Email',
+      placeHolder: 'janedoe@gmail.com',
       required: true,
       error: false,
+      errorMessage: '',
     },
     {
-      id: 4,
+      id: 2,
       type: 'password',
       label: 'Password',
       name: 'password',
       placeHolder: 'Password',
       required: true,
       error: false,
-    },
-    {
-      id: 5,
-      type: 'password',
-      label: 'Confirm Password',
-      name: 'confirmPassword',
-      placeHolder: 'Confirm Password',
-      required: true,
-      error: false,
+      errorMessage: '',
     },
   ])
   const router = useRouter()
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (inputs.some(input => input.error)) return //If any error inputs are true, return
-
-    const { status } = await fetch(`http://localhost:3000/api/signup`, {
+    const { code, message } = await fetch(`http://localhost:3000/api/signin`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json;charset=utf-8',
       },
       body: JSON.stringify({
-        firstName: inputData.firstName,
-        lastName: inputData.lastName,
-        nickname: inputData.nickname,
         email: inputData.email,
-        password: bcrypt.hashSync(inputData.password, 10),
+        password: inputData.password,
       }),
-    })
+    }).then(res => res.json())
 
-    const codeNum = Number(status.toString().charAt(0))
+    const codeNum = Number(code.toString().charAt(0))
 
     switch (codeNum) {
       case 2:
         router.push('/dashboard')
+        break
+      case 4:
+        if (message.includes('Email')) {
+          setInputs(oldInputs =>
+            oldInputs.map(input =>
+              input.name === 'email'
+                ? { ...input, errorMessage: message }
+                : { ...input, errorMessage: '' },
+            ),
+          )
+        } else {
+          setInputs(oldInputs =>
+            oldInputs.map(input =>
+              input.name === 'password'
+                ? { ...input, errorMessage: message }
+                : { ...input, errorMessage: '' },
+            ),
+          )
+        }
         break
     }
   }
@@ -123,47 +103,17 @@ function Form() {
     setInputData({ ...inputData, [name]: val })
   }
 
-  useEffect(() => {
-    const confirmPassword = inputData?.confirmPassword
-    const password = inputData?.password
-    if (confirmPassword === undefined) return
-    setInputs(
-      inputs.map(input =>
-        input.id === 5
-          ? { ...input, error: password !== confirmPassword }
-          : input,
-      ),
-    )
-  }, [inputData])
-
   return (
     <form
       onSubmit={e => handleSubmit(e)}
-      className="mt-6"
+      className="w-full mt-6"
     >
-      <div className="flex gap-x-6">
-        {inputs.map(props => (
-          <>
-            {props.id <= 2 && (
-              <Input
-                key={props.id}
-                {...props}
-                onChange={onChange}
-              />
-            )}
-          </>
-        ))}
-      </div>
       {inputs.map(props => (
-        <>
-          {props.id > 2 && (
-            <Input
-              key={props.id}
-              {...props}
-              onChange={onChange}
-            />
-          )}
-        </>
+        <Input
+          key={props.id}
+          {...props}
+          onChange={onChange}
+        />
       ))}
       <Button
         type="default"
@@ -176,14 +126,14 @@ function Form() {
 }
 
 function Input(props: any) {
-  const { label, error, onChange, name } = props
+  const { label, error, onChange, name, errorMessage } = props
   const [focused, setFocused] = useState(false)
   return (
     <div>
       <label className="mt-10 font-medium text-text">{label}</label>
       <input
         name
-        className={`p-4 rounded-full outline-none w-full mb-4 bg-gray-600 text-text transition-all ${
+        className={`p-4 rounded-2xl outline-none w-full bg-gray-600 text-text transition-all ${
           focused
             ? `${
                 error
@@ -197,6 +147,9 @@ function Input(props: any) {
         onBlur={() => setFocused(true)}
         onChange={e => onChange(name, e.target.value)}
       />
+      <span className="block mt-1 mb-4 text-sm text-red-500 text-danger">
+        {errorMessage}
+      </span>
     </div>
   )
 }
