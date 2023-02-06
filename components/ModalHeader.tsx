@@ -9,7 +9,7 @@ export default function ModalHeader({
   return (
     <div className="flex items-center justify-end w-full">
       <IoClose
-        className="w-7 h-7 text-text"
+        className="cursor-pointer w-7 h-7 text-text"
         onClick={() => setState(false)}
       />
     </div>

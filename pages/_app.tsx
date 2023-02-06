@@ -1,8 +1,14 @@
+import ListProvider from '@/context/ListProvider'
+import UserProvider from '@/context/UserProvider'
 import '@/styles/globals.css'
 import type { AppProps } from 'next/app'
-import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
-import { useState } from 'react'
 
 export default function App({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
+  return (
+    <UserProvider>
+      <ListProvider>
+        <Component {...pageProps} />
+      </ListProvider>
+    </UserProvider>
+  )
 }

@@ -1,18 +1,34 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { motion } from 'framer-motion'
 import Text from '@/components/Text'
 import { HiQueueList } from 'react-icons/hi2'
-import { IoClose } from 'react-icons/io5'
 import TextArea from '@/components/TextArea'
 import Button from '@/components/Button'
 import Input from '@/components/Input'
 import ModalHeader from '@/components/ModalHeader'
+import supabase from '@/utils/supabase'
+import { UserContext } from '@/context/UserProvider'
+import { ListContext } from '@/context/ListProvider'
+
+async function insertList(
+  userId: number,
+  name: string,
+  color: null,
+  description: string,
+) {
+  return await supabase
+    .from('list')
+    .insert({ name, userId, color: null, description })
+    .select()
+}
 
 export default function CreateList({
   setState,
 }: {
   setState: (val: boolean) => void
 }) {
+  const { user } = useContext(UserContext)
+  const { lists, setLists } = useContext(ListContext)
   const [inputData, setInputData] = useState<any>({})
   const onChange = (name: string, val: string) => {
     setInputData({ ...inputData, [name]: val })
@@ -25,10 +41,26 @@ export default function CreateList({
     },
   ]
 
-  const handleSubmit = () => {
+  const handleSubmit = async (e: any) => {
     if (!inputData?.listName) return //If there is no title, return
     const listName = inputData.listName
     const listDesc = inputData.description
+    const { data, error, status } = await insertList(
+      user.id,
+      listName,
+      null,
+      listDesc,
+    )
+
+    switch (status) {
+      case 201:
+        setLists((oldLists: any) => [...oldLists, data])
+
+        break
+      default:
+        setState(false)
+        break
+    }
   }
 
   return (
@@ -38,7 +70,13 @@ export default function CreateList({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <motion.div className="w-screen max-w-sm p-6 rounded-3xl bg-primary">
+      <motion.div
+        initial={{ y: '100%', opacity: 0 }}
+        animate={{ y: '0%', opacity: 1 }}
+        exit={{ y: '100%', opacity: 0 }}
+        transition={{ duration: 0.5, type: 'spring' }}
+        className="w-screen max-w-sm p-6 rounded-3xl bg-primary"
+      >
         <ModalHeader setState={setState} />
         <div className="flex items-center justify-center w-16 h-16 rounded-full bg-secondary">
           <HiQueueList className="w-8 h-8 text-text" />
@@ -64,7 +102,7 @@ export default function CreateList({
         <Button
           type="default"
           className="w-full"
-          onClick={() => handleSubmit()}
+          onClick={e => handleSubmit(e)}
         >
           Create list
         </Button>

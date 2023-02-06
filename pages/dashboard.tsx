@@ -1,19 +1,26 @@
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Header from '@/components/Header'
-import Input from '@/components/Input'
 import Layout from '@/components/Layout'
 import Text from '@/components/Text'
-import TextArea from '@/components/TextArea'
 import CreateList from '@/modals/CreateList'
-import { AnimatePresence, motion } from 'framer-motion'
-import { useState } from 'react'
-import { HiQueueList } from 'react-icons/hi2'
+import { AnimatePresence } from 'framer-motion'
+import { GetServerSideProps } from 'next'
+import { useContext, useEffect, useState } from 'react'
+import { getCookies } from 'cookies-next'
+import * as jose from 'jose'
+import { iUser } from '@/interfaces/interface'
+import { UserContext } from '@/context/UserProvider'
 
-export default function Home() {
+export default function Home({ user }: { user: iUser }) {
   const [openCreateList, setOpenCreateList] = useState(true)
+  const { setUser } = useContext(UserContext)
+
+  useEffect(() => {
+    setUser(user ?? null)
+  }, [user])
   return (
-    <>
+    <div className="relative">
       <Layout className="py-6">
         <Header />
         <Text
@@ -36,6 +43,15 @@ export default function Home() {
       <AnimatePresence>
         {openCreateList && <CreateList setState={setOpenCreateList} />}
       </AnimatePresence>
-    </>
+    </div>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async context => {
+  const { userID } = getCookies(context)
+
+  // NOTE: Include validating jwt? Middleware already includes validation.
+  const publicKey = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET)
+  const decoded = await jose.jwtVerify(userID!, publicKey)
+  return { props: { user: decoded.payload } }
 }
