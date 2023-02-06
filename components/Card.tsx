@@ -8,16 +8,19 @@ export default function Card({ className }: { className?: string }) {
       <Text
         type="p"
         style="cardheading"
-        className="text-2xl  p-5 rounded-3xl bg-gray-600 hover:bg-gray-600/50 transition cursor-pointer"
+        className="p-5 text-2xl transition bg-gray-600 cursor-pointer rounded-3xl hover:bg-gray-600/50"
       >
         Design
       </Text>
       {[0, 1, 2, 3].map((data: any) => (
-        <Todo data={data} />
+        <Todo
+          key={data}
+          data={data}
+        />
       ))}
       <Button
         type="none"
-        className="w-full border-t p-4 text-text font-medium border-gray-100/10"
+        className="w-full p-4 font-medium border-t text-text border-gray-100/10"
       >
         View Collection
       </Button>
@@ -28,7 +31,7 @@ export default function Card({ className }: { className?: string }) {
 function Todo({ data }: { data: undefined }) {
   const hasCompleted = true
   return (
-    <div className="w-full p-5 flex items-center justify-start gap-4">
+    <div className="flex items-center justify-start w-full gap-4 p-5">
       <div
         className={`rounded-full  w-7 h-7 border-2 border-tertiary  ${
           hasCompleted

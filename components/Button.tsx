@@ -7,6 +7,7 @@ interface ButtonProps {
   children: ReactNode
   href?: string
   className?: string
+  onClick?: (val: any) => void
 }
 
 interface ButtonPropsWithActive extends ButtonProps {
@@ -43,7 +44,10 @@ export default function Button(Props: Props) {
       {Props.href ? (
         <Link href={Props.href}>{Props.children}</Link>
       ) : (
-        <button className={`${css} ${Props.className}`}>
+        <button
+          onClick={Props.onClick}
+          className={`${css} ${Props.className}`}
+        >
           {Props.children}
         </button>
       )}
