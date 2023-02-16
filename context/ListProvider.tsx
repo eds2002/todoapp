@@ -1,4 +1,7 @@
-import React, { createContext, useState } from 'react'
+import { iList } from '@/interfaces/interface'
+import supabase from '@/utils/supabase'
+import React, { createContext, useContext, useEffect, useState } from 'react'
+import { UserContext } from './UserProvider'
 
 interface contextProps {
   lists: any
@@ -12,16 +15,36 @@ export default function ListProvider({
 }: {
   children: React.ReactNode
 }) {
-  interface iList {
-    id: number
-    name: string
-    desc: string
-  }
+  const { user } = useContext(UserContext)
   const [lists, setLists] = useState<iList[]>([])
+
+  const userId = user?.id ?? null
+  useGetLists(setLists, userId)
 
   return (
     <ListContext.Provider value={{ lists, setLists }}>
       {children}
     </ListContext.Provider>
   )
+}
+
+function useGetLists(
+  setLists: React.Dispatch<React.SetStateAction<iList[]>>,
+  userId: number | null,
+) {
+  useEffect(() => {
+    ;(async () => {
+      if (!userId) return
+      const { data, error, status } = await getLists(userId)
+      switch (status) {
+        case 200:
+          setLists(data as iList[])
+          break
+      }
+    })()
+  }, [userId])
+}
+
+async function getLists(id: number) {
+  return await supabase.from('list').select().eq('userId', id)
 }

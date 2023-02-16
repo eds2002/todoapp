@@ -11,24 +11,22 @@ import { getCookies } from 'cookies-next'
 import * as jose from 'jose'
 import { iUser } from '@/interfaces/interface'
 import { UserContext } from '@/context/UserProvider'
+import Lists from '@/components/Lists'
 
 export default function Home({ user }: { user: iUser }) {
-  const [openCreateList, setOpenCreateList] = useState(true)
-  const { setUser } = useContext(UserContext)
+  const [openCreateList, setOpenCreateList] = useState(false)
+  const { user: currentUser, setUser } = useContext(UserContext)
 
-  useEffect(() => {
-    setUser(user ?? null)
-  }, [user])
   return (
     <div className="relative">
       <Layout className="py-6">
-        <Header />
+        <Header headingName="Dashboard" />
         <Text
           type="p"
           className="mt-10 text-4xl font-semibold"
         >
           Good morning,
-          <br /> Eduardo.
+          <br /> {currentUser?.firstName}
         </Text>
         <Button
           type="default"
@@ -37,21 +35,11 @@ export default function Home({ user }: { user: iUser }) {
         >
           Create List
         </Button>
-        <Card className="mt-2" />
-        <Card className="mt-10" />
+        <Lists />
       </Layout>
       <AnimatePresence>
         {openCreateList && <CreateList setState={setOpenCreateList} />}
       </AnimatePresence>
     </div>
   )
-}
-
-export const getServerSideProps: GetServerSideProps = async context => {
-  const { userID } = getCookies(context)
-
-  // NOTE: Include validating jwt? Middleware already includes validation.
-  const publicKey = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET)
-  const decoded = await jose.jwtVerify(userID!, publicKey)
-  return { props: { user: decoded.payload } }
 }

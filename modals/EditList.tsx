@@ -7,85 +7,108 @@ import Button from '@/components/Button'
 import Input from '@/components/Input'
 import ModalHeader from '@/components/ModalHeader'
 import supabase from '@/utils/supabase'
-import { UserContext } from '@/context/UserProvider'
 import { ListContext } from '@/context/ListProvider'
+import { iList } from '@/interfaces/interface'
 
-async function insertList(
-  userId: number,
-  name: string,
-  color: null,
-  description: string
-) {
-  return await supabase
-    .from('list')
-    .insert({ name, userId, color: null, description })
-    .select()
+async function updateList(id: number, update: any) {
+  try {
+    const { status } = await supabase.from('list').update(update).eq('id', id)
+    return [status, null]
+  } catch (error) {
+    return [null, error]
+  }
 }
 
 async function findList(requestedName: string) {
   return await supabase.from('list').select().eq('name', requestedName)
 }
 
-export default function CreateList({
-  setState
+export default function EdtList({
+  setState,
+  name,
+  description,
+  id,
 }: {
   setState: (val: boolean) => void
+  name: string
+  description: string | any
+  id: number
 }) {
-  const { user } = useContext(UserContext)
   const { setLists } = useContext(ListContext)
-  const [inputData, setInputData] = useState<any>({})
-  const onChange = (name: string, val: string) => {
-    setInputData({ ...inputData, [name]: val })
-  }
+  const [inputData, setInputData] = useState<any>({
+    listName: name,
+    description,
+  })
   const [inputs, setInputs] = useState([
     {
       id: 1,
       name: 'listName',
       placeHolder: 'List name',
-      errorMsg: ''
-    }
+      errorMsg: '',
+    },
   ])
+  const onChange = (name: string, val: string) => {
+    setInputData({ ...inputData, [name]: val })
+  }
 
   const handleSubmit = async (e: any) => {
     if (!inputData?.listName) return //If there is no title, return
-    const listName = inputData.listName
-    const listDesc = inputData.description
+    if (inputData.listName === name && inputData.description === description) {
+      setState(false)
+      return
+    }
+
+    let updateQuery: any = {} //Creates an object query for supabase, only changing whats edited
+    if (inputData.listName !== name) {
+      updateQuery['name'] = inputData.listName
+    }
+    if (inputData.description !== description) {
+      updateQuery['description'] = inputData.description
+    }
 
     // Handle duplicate lists
-    const { data: requestedListName } = await findList(listName)
+    const { data: requestedListName } = await findList(inputData.listName)
     if (requestedListName?.length !== 0) {
       setInputs(oldInput =>
         oldInput.map(input =>
           input.id === 1
             ? { ...input, errorMsg: 'List name already taken. Pick another.' }
-            : input
-        )
+            : input,
+        ),
       )
       return
     }
 
-    if (!user?.id) return //NOTE: This seems kinda sloppy to avoid ts error, come back to this.
-    const { data, error, status } = await insertList(
-      user.id,
-      listName,
-      null,
-      listDesc
-    )
+    const [status, error] = await updateList(id, updateQuery)
 
-    switch (status) {
-      case 201:
-        setLists((oldLists: any) => [...oldLists, ...(data as any)])
-        setState(false)
-        break
-      default:
-        setState(false)
-        break
+    if (!error) {
+      switch (String(status).charAt(0)) {
+        case '2': {
+          setLists((oldLists: iList[]) =>
+            oldLists.map(list =>
+              list.id === id
+                ? {
+                    ...list,
+                    name: inputData.listName,
+                    description: inputData.description,
+                  }
+                : list,
+            ),
+          )
+          setState(false)
+          break
+        }
+        default: {
+          setState(false)
+          break
+        }
+      }
     }
   }
 
   return (
     <motion.div
-      className="fixed inset-0 flex items-center justify-center bg-black/80"
+      className="fixed inset-0 z-20 flex items-center justify-center bg-black/80"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -106,19 +129,20 @@ export default function CreateList({
           type="h1"
           className="mb-2"
         >
-          Create my list
+          Edit my list
         </Text>
         {inputs.map(props => (
           <Input
             key={props.id}
             {...props}
             onChange={onChange}
+            defaultValue={name}
           />
         ))}
         <TextArea
-          defaultValue={''}
           placeholder="List description (Optional)"
           onChange={onChange}
+          defaultValue={description}
         />
         <Button
           type="default"

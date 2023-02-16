@@ -42,7 +42,12 @@ export default function Button(Props: Props) {
   return (
     <>
       {Props.href ? (
-        <Link href={Props.href}>{Props.children}</Link>
+        <Link
+          href={Props.href}
+          className={`${css} ${Props.className}`}
+        >
+          {Props.children}
+        </Link>
       ) : (
         <button
           onClick={Props.onClick}
