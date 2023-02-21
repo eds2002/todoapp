@@ -15,7 +15,7 @@ async function insertTodo(
   listId: number | undefined,
   name: string,
   dueBy: string,
-  isCompleted: boolean,
+  isCompleted: boolean
 ) {
   return await supabase
     .from('todo')
@@ -23,14 +23,14 @@ async function insertTodo(
       list_id: listId,
       name: name,
       due_by: dueBy,
-      is_completed: isCompleted,
+      is_completed: isCompleted
     })
     .select()
 }
 
 export default function AddTodo({
   setState,
-  listId,
+  listId
 }: {
   setState: (val: boolean) => void
   listId: number
@@ -43,15 +43,15 @@ export default function AddTodo({
       id: 1,
       name: 'todoName',
       placeHolder: 'Pick up birthday cake',
-      errorMsg: '',
+      errorMsg: ''
     },
     {
       id: 2,
       name: 'todoDueDate',
       placeHolder: 'Pick up birthday cake',
       type: 'datetime-local',
-      errorMsg: '',
-    },
+      errorMsg: ''
+    }
   ])
   const onChange = (name: string, val: string) => {
     setInputData({ ...inputData, [name]: val })
@@ -63,8 +63,8 @@ export default function AddTodo({
         inputs.map(input =>
           input.id === 1
             ? { ...input, errorMsg: 'Input cannot be blank.' }
-            : input,
-        ),
+            : input
+        )
       )
       return
     } //If there is no title, return
@@ -73,8 +73,8 @@ export default function AddTodo({
         inputs.map(input =>
           input.id === 2
             ? { ...input, errorMsg: 'Please pick a valid date.' }
-            : input,
-        ),
+            : input
+        )
       )
       return
     } //If there is no title, return
@@ -87,10 +87,10 @@ export default function AddTodo({
           input.id === 2
             ? {
                 ...input,
-                errorMsg: 'Invalid date, pick a date greater than today.',
+                errorMsg: 'Invalid date, pick a date greater than today.'
               }
-            : input,
-        ),
+            : input
+        )
       )
       return
     }
@@ -99,7 +99,7 @@ export default function AddTodo({
       listId,
       inputData.todoName,
       inputData.todoDueDate,
-      false,
+      false
     )
 
     switch (status) {

@@ -1,11 +1,16 @@
 import React, { useState } from 'react'
 
 export default function Input(props: any) {
-  const { label, onChange, name, errorMsg } = props
+  const { label, onChange, name, errorMsg, handleKeyPress } = props
   return (
     <div className="mb-4">
       <label className="mt-10 font-medium text-text">{label}</label>
       <input
+        onKeyUp={e => {
+          if (handleKeyPress) {
+            handleKeyPress(e)
+          }
+        }}
         name
         className={`w-full p-4  font-medium transition-all outline-none rounded-2xl text-text ${
           errorMsg === '' ? 'bg-gray-600' : 'bg-red-800/50'

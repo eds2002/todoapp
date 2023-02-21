@@ -2,7 +2,6 @@ import Button from '@/components/Button'
 import Layout from '@/components/Layout'
 import Text from '@/components/Text'
 import React, { useEffect, useState } from 'react'
-import supabase from '@/utils/supabase'
 import bcrypt from 'bcryptjs'
 import { useRouter } from 'next/router'
 
@@ -43,7 +42,7 @@ function Form() {
       name: 'firstName',
       placeHolder: 'First Name',
       required: true,
-      error: false,
+      error: false
     },
     {
       id: 2,
@@ -52,7 +51,7 @@ function Form() {
       name: 'lastName',
       placeHolder: 'Last Name',
       required: true,
-      error: false,
+      error: false
     },
     {
       id: 3,
@@ -61,7 +60,7 @@ function Form() {
       name: 'nickname',
       placeHolder: 'Nickname (optional)',
       required: false,
-      error: false,
+      error: false
     },
     {
       id: 4,
@@ -70,7 +69,7 @@ function Form() {
       name: 'email',
       placeHolder: 'Email',
       required: true,
-      error: false,
+      error: false
     },
     {
       id: 4,
@@ -79,7 +78,7 @@ function Form() {
       name: 'password',
       placeHolder: 'Password',
       required: true,
-      error: false,
+      error: false
     },
     {
       id: 5,
@@ -88,8 +87,8 @@ function Form() {
       name: 'confirmPassword',
       placeHolder: 'Confirm Password',
       required: true,
-      error: false,
-    },
+      error: false
+    }
   ])
   const router = useRouter()
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -99,15 +98,15 @@ function Form() {
     const { status } = await fetch(`http://localhost:3000/api/signup`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json;charset=utf-8',
+        'Content-Type': 'application/json;charset=utf-8'
       },
       body: JSON.stringify({
         firstName: inputData.firstName,
         lastName: inputData.lastName,
         nickname: inputData.nickname,
         email: inputData.email,
-        password: bcrypt.hashSync(inputData.password, 10),
-      }),
+        password: bcrypt.hashSync(inputData.password, 10)
+      })
     })
 
     const codeNum = Number(status.toString().charAt(0))
@@ -131,8 +130,8 @@ function Form() {
       inputs.map(input =>
         input.id === 5
           ? { ...input, error: password !== confirmPassword }
-          : input,
-      ),
+          : input
+      )
     )
   }, [inputData])
 

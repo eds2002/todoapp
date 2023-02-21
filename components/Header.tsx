@@ -1,5 +1,6 @@
 import { UserContext } from '@/context/UserProvider'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import React, { useCallback, useContext } from 'react'
 import Text from './Text'
 
@@ -11,7 +12,7 @@ export default function Header({
   const { user } = useContext(UserContext)
 
   const getFirstLetterOfFirstName = useCallback(
-    () => user?.firstName.charAt(0).toUpperCase(),
+    () => user?.firstName?.charAt(0).toUpperCase(),
     [user]
   )
   return (
@@ -22,14 +23,16 @@ export default function Header({
       >
         {headingName}
       </Text>
-      <div className="flex items-center justify-center text-3xl font-semibold text-white bg-black rounded-full cursor-pointer w-14 h-14">
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          {getFirstLetterOfFirstName()}
-        </motion.p>
-      </div>
+      <Link href="/dashboard/settings">
+        <div className="flex items-center justify-center text-3xl font-semibold text-white rounded-full cursor-pointer bg-slate-700 w-14 h-14">
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            {getFirstLetterOfFirstName()}
+          </motion.p>
+        </div>
+      </Link>
     </header>
   )
 }

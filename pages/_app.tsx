@@ -25,6 +25,10 @@ export default function App({ Component, pageProps, data }: App) {
 App.getInitialProps = async ({ ctx }: { ctx: any }) => {
   const { userID } = getCookies(ctx)
   const publicKey = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET)
-  const decoded = await jose.jwtVerify(userID!, publicKey)
-  return { data: decoded.payload }
+  if (userID) {
+    const decoded = await jose.jwtVerify(userID!, publicKey)
+    return { data: decoded.payload }
+  } else {
+    return { data: {} }
+  }
 }

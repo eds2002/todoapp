@@ -27,7 +27,7 @@ async function deleteTodo(id: number) {
 export function Todo({
   data,
   className,
-  index,
+  index
 }: {
   data: iTodo
   className: string
@@ -67,7 +67,7 @@ export function Todo({
 function Checkbox({
   data,
   isCompleted,
-  setIsCompleted,
+  setIsCompleted
 }: {
   data: iTodo
   isCompleted: boolean
@@ -79,8 +79,8 @@ function Checkbox({
     if (!error) {
       setTodos((oldTodos: iTodo[]) =>
         oldTodos.map((todo: iTodo) =>
-          todo.id === id ? { ...todo, isCompleted: !isCompleted } : todo,
-        ),
+          todo.id === id ? { ...todo, isCompleted: !isCompleted } : todo
+        )
       )
       setIsCompleted(!isCompleted)
     }
@@ -99,7 +99,7 @@ function Checkbox({
 
 function NameAndCreated({
   data,
-  isCompleted,
+  isCompleted
 }: {
   data: iTodo
   isCompleted: boolean
@@ -160,11 +160,11 @@ function DueBy({ data, isCompleted }: { data: iTodo; isCompleted: boolean }) {
 
     if (diff.days === 0) {
       return `in (${diff.hours?.toFixed(0)} hours and ${diff.minutes?.toFixed(
-        0,
+        0
       )} minutes)`
     } else {
       return `in (${diff.days?.toFixed(0)} days and ${diff.hours?.toFixed(
-        0,
+        0
       )} hours)`
     }
   }
@@ -201,7 +201,7 @@ function DueBy({ data, isCompleted }: { data: iTodo; isCompleted: boolean }) {
 function SettingsContainer({
   setState,
   data: todoData,
-  setEditTodo,
+  setEditTodo
 }: {
   setState: (val: boolean) => void
   data: iTodo
@@ -210,11 +210,13 @@ function SettingsContainer({
   const { todos, setTodos } = useContext(TodosContext)
   const settings = [
     {
+      id: 'edit',
       name: 'Edit',
       icon: IoPencil,
-      onClick: () => setEditTodo(true),
+      onClick: () => setEditTodo(true)
     },
     {
+      id: 'delete',
       name: 'Delete',
       icon: IoBackspace,
       onClick: async () => {
@@ -224,7 +226,7 @@ function SettingsContainer({
           switch (code) {
             case 2: {
               setTodos((todos: iTodo[]) =>
-                todos.filter(todo => todo.id !== todoData.id),
+                todos.filter(todo => todo.id !== todoData.id)
               )
               setState(false)
               break
@@ -235,8 +237,8 @@ function SettingsContainer({
             }
           }
         }
-      },
-    },
+      }
+    }
   ]
   return (
     <>
@@ -249,6 +251,7 @@ function SettingsContainer({
       >
         {settings.map(val => (
           <p
+            key={val.id}
             onClick={val.onClick}
             className="flex items-center p-3 font-medium text-white cursor-pointer hover:bg-slate-700/50 gap-x-2"
           >
@@ -266,7 +269,7 @@ const itemVariant = {
   visible: (custom: number) => ({
     opacity: 1,
     transition: {
-      delay: custom * 0.1,
-    },
-  }),
+      delay: custom * 0.1
+    }
+  })
 }
