@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import React, { ReactNode } from 'react'
+import { VscLoading } from 'react-icons/vsc'
 
 type types = 'chip' | 'default' | 'none'
 
@@ -8,6 +9,7 @@ interface ButtonProps {
   href?: string
   className?: string
   onClick?: (val: any) => void
+  isLoading?: boolean
 }
 
 interface ButtonPropsWithActive extends ButtonProps {
@@ -51,9 +53,15 @@ export default function Button(Props: Props) {
       ) : (
         <button
           onClick={Props.onClick}
-          className={`${css} ${Props.className}`}
+          className={`${css} ${Props.className} flex items-center justify-center`}
         >
-          {Props.children}
+          {Props.isLoading ? (
+            <>
+              <VscLoading className="w-6 h-6 animate-spin" />
+            </>
+          ) : (
+            <>{Props.children}</>
+          )}
         </button>
       )}
     </>

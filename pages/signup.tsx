@@ -1,9 +1,10 @@
 import Button from '@/components/Button'
 import Layout from '@/components/Layout'
 import Text from '@/components/Text'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import bcrypt from 'bcryptjs'
 import { useRouter } from 'next/router'
+import { UserContext } from '@/context/UserProvider'
 
 export default function Signup() {
   return (
@@ -20,7 +21,7 @@ export default function Signup() {
             </Text>
             <Text
               type="p"
-              className="text-lg mt-2 w-[30ch] font-medium opacity-50"
+              className="text-lg mt-2 w-[30ch] font-normal opacity-50"
             >
               Start managing the important. Sign up today, all for free.
             </Text>
@@ -33,6 +34,8 @@ export default function Signup() {
 }
 
 function Form() {
+  const { setUser } = useContext(UserContext)
+  const [loading, setLoading] = useState(false)
   const [inputData, setInputData] = useState<any>({})
   const [inputs, setInputs] = useState([
     {
@@ -93,9 +96,12 @@ function Form() {
   const router = useRouter()
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (loading) return
+    setLoading(true)
     if (inputs.some(input => input.error)) return //If any error inputs are true, return
+    const origin = window.location.origin
 
-    const { status } = await fetch(`http://localhost:3000/api/signup`, {
+    const { code, userId } = await fetch(`${origin}/api/signup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json;charset=utf-8'
@@ -107,13 +113,19 @@ function Form() {
         email: inputData.email,
         password: bcrypt.hashSync(inputData.password, 10)
       })
-    })
+    }).then(res => res.json())
 
-    const codeNum = Number(status.toString().charAt(0))
+    const codeNum = Number(code.toString().charAt(0))
 
     switch (codeNum) {
       case 2:
-        router.push('/dashboard')
+        setUser(userId)
+        await router.push('/dashboard')
+        setLoading(false)
+        break
+
+      default:
+        setLoading(true)
         break
     }
   }
@@ -167,6 +179,7 @@ function Form() {
       <Button
         type="default"
         className="w-full mt-4"
+        isLoading={loading}
       >
         Create my account
       </Button>

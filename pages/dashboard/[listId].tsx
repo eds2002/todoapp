@@ -176,7 +176,7 @@ const Filters = ({
   sortBy: 'Due soon' | 'Date Created'
   setSortBy: (val: 'Due soon' | 'Date Created') => void
 }) => (
-  <div>
+  <div className="flex">
     <Button
       type="chip"
       className="py-2 mt-4 text-xs"

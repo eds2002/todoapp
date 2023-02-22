@@ -9,6 +9,8 @@ import bcrypt from 'bcryptjs'
 import { IoCheckmark } from 'react-icons/io5'
 import Success from '@/modals/Success'
 import { iUser } from '@/interfaces/interface'
+import Button from '@/components/Button'
+import { useRouter } from 'next/router'
 
 async function getPassword(id: number) {
   try {
@@ -59,6 +61,7 @@ async function updateFirstName(id: number, firstName: string) {
 }
 
 export default function settings() {
+  const router = useRouter()
   const { user, setUser } = useContext(UserContext)
   const [password, setPassword] = useState('')
   const [inputData, setInputData] = useState<any>({})
@@ -200,6 +203,20 @@ export default function settings() {
     })
   }, [])
 
+  const handleLogout = async () => {
+    const origin = window.location.origin
+    const { code, message } = await fetch(`${origin}/api/logout`).then(res =>
+      res.json()
+    )
+
+    switch (code) {
+      case 200: {
+        router.push('/')
+        break
+      }
+    }
+  }
+
   useEffect(() => {
     getUserPassword()
   }, [])
@@ -225,6 +242,13 @@ export default function settings() {
             />
           ))}
           <Checkbox setInputs={setInputs} />
+          <Button
+            type="default"
+            className="w-full mt-24 ml-auto md:px-12 sm:w-auto"
+            onClick={() => handleLogout()}
+          >
+            Logout
+          </Button>
         </Layout>
       </div>
       {openSuccessModal && (

@@ -1,12 +1,14 @@
 import Button from '@/components/Button'
 import Layout from '@/components/Layout'
 import Text from '@/components/Text'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import supabase from '@/utils/supabase'
 import bcrypt from 'bcryptjs'
 import { useRouter } from 'next/router'
+import { UserContext } from '@/context/UserProvider'
 
 export default function Signup() {
+  const { user, setUser } = useContext(UserContext)
   return (
     <main className="h-screen">
       <Layout className="flex items-center justify-center h-full pt-6">
@@ -34,7 +36,9 @@ export default function Signup() {
 }
 
 function Form() {
+  const { setUser } = useContext(UserContext)
   const [inputData, setInputData] = useState<any>({})
+  const [loading, setLoading] = useState(false)
   const [inputs, setInputs] = useState([
     {
       id: 1,
@@ -44,7 +48,7 @@ function Form() {
       placeHolder: 'janedoe@gmail.com',
       required: true,
       error: false,
-      errorMessage: '',
+      errorMessage: ''
     },
     {
       id: 2,
@@ -54,28 +58,33 @@ function Form() {
       placeHolder: 'Password',
       required: true,
       error: false,
-      errorMessage: '',
-    },
+      errorMessage: ''
+    }
   ])
   const router = useRouter()
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const { code, message } = await fetch(`http://localhost:3000/api/signin`, {
+    if (loading) return
+    setLoading(true)
+    const origin = window.location.origin
+    const { code, message, userId } = await fetch(`${origin}/api/signin`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json;charset=utf-8',
+        'Content-Type': 'application/json;charset=utf-8'
       },
       body: JSON.stringify({
         email: inputData.email,
-        password: inputData.password,
-      }),
+        password: inputData.password
+      })
     }).then(res => res.json())
 
     const codeNum = Number(code.toString().charAt(0))
 
     switch (codeNum) {
       case 2:
-        router.push('/dashboard')
+        setUser(userId)
+        await router.push('/dashboard')
+        setLoading(false)
         break
       case 4:
         if (message.includes('Email')) {
@@ -83,18 +92,19 @@ function Form() {
             oldInputs.map(input =>
               input.name === 'email'
                 ? { ...input, errorMessage: message }
-                : { ...input, errorMessage: '' },
-            ),
+                : { ...input, errorMessage: '' }
+            )
           )
         } else {
           setInputs(oldInputs =>
             oldInputs.map(input =>
               input.name === 'password'
                 ? { ...input, errorMessage: message }
-                : { ...input, errorMessage: '' },
-            ),
+                : { ...input, errorMessage: '' }
+            )
           )
         }
+        setLoading(false)
         break
     }
   }
@@ -118,8 +128,9 @@ function Form() {
       <Button
         type="default"
         className="w-full mt-4"
+        isLoading={loading}
       >
-        Create my account
+        Login
       </Button>
     </form>
   )

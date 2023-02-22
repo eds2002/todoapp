@@ -1,15 +1,25 @@
 import Button from '@/components/Button'
-import Card from '@/components/Card'
-import Header from '@/components/Header'
-import Layout from '@/components/Layout'
-import Text from '@/components/Text'
-import Head from 'next/head'
-import Image from 'next/image'
 
 export default function Home() {
   return (
-    <div>
-      <p>HOME</p>
+    <div className="flex flex-col items-center justify-center h-screen">
+      <h1 className="mb-4 text-3xl font-semibold text-white">Todo App</h1>
+      <div className="flex items-center gap-x-4">
+        <Button
+          href="/signup"
+          type="default"
+          className="px-8"
+        >
+          Signup
+        </Button>
+        <Button
+          href="signin"
+          type="default"
+          className="px-8"
+        >
+          Login
+        </Button>
+      </div>
     </div>
   )
 }

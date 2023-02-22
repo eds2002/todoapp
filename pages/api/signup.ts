@@ -7,6 +7,7 @@ import { setCookie } from 'cookies-next'
 type Data = {
   code: number
   message: string
+  userId?: any
 }
 
 async function insertUser(
@@ -14,7 +15,7 @@ async function insertUser(
   lastName: string,
   nickname: string,
   email: string,
-  password: string,
+  password: string
 ) {
   return await supabase
     .from('user')
@@ -23,20 +24,20 @@ async function insertUser(
       last_name: lastName,
       nickname,
       email,
-      password,
+      password
     })
     .select()
 }
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>,
+  res: NextApiResponse<Data>
 ) {
   const { firstName, lastName, nickname, email, password } = req.body
   const {
     data: userData,
     status,
-    error,
+    error
   } = await insertUser(firstName, lastName, nickname, email, password)
 
   const codeNum = Number(status.toString().split('')[0])
@@ -50,9 +51,19 @@ export default async function handler(
         nickname,
         email,
         req,
-        res,
+        res
       )
-      return res.status(status).json({ code: status, message: 'SUCCESS' })
+      return res.json({
+        code: status,
+        message: 'SUCCESS',
+        userId: {
+          id: userData![0].id,
+          firstName: userData![0].first_name,
+          lastName: userData![0].last_name,
+          nickname: userData![0].nickname,
+          email: userData![0].email
+        }
+      })
     }
   }
 }
@@ -64,10 +75,10 @@ async function generateJWT(
   nickname: string,
   email: string,
   req: NextApiRequest,
-  res: NextApiResponse<Data>,
+  res: NextApiResponse<Data>
 ) {
   const privateKey = new TextEncoder().encode(
-    process.env.NEXT_PUBLIC_JWT_SECRET,
+    process.env.NEXT_PUBLIC_JWT_SECRET
   )
   const alg = 'HS256'
   const token = await new jose.SignJWT({
@@ -75,7 +86,7 @@ async function generateJWT(
     firstName,
     lastName,
     nickname,
-    email,
+    email
   })
     .setProtectedHeader({ alg })
     .sign(privateKey)

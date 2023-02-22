@@ -8,6 +8,7 @@ import bcrypt from 'bcryptjs'
 type Data = {
   code: number
   message: string
+  userId?: any
 }
 
 async function findEmailRow(email: string) {
@@ -16,7 +17,7 @@ async function findEmailRow(email: string) {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>,
+  res: NextApiResponse<Data>
 ) {
   const { email, password } = req.body
 
@@ -33,14 +34,24 @@ export default async function handler(
       userData[0].nickname,
       userData[0].email,
       req,
-      res,
+      res
     )
 
-    return res.status(200).json({ code: 200, message: 'SUCCESS' })
+    return res.status(200).json({
+      code: 200,
+      message: 'SUCCESS',
+      userId: {
+        id: userData[0].id,
+        firstName: userData[0].first_name,
+        lastName: userData[0].last_name,
+        nickname: userData[0].nickname,
+        email: userData[0].email
+      }
+    })
   } else {
     return res.status(400).json({
       code: 400,
-      message: 'Password is incorrect, please try again.',
+      message: 'Password is incorrect, please try again.'
     })
   }
 }
@@ -52,10 +63,10 @@ async function generateJWT(
   nickname: string,
   email: string,
   req: NextApiRequest,
-  res: NextApiResponse<Data>,
+  res: NextApiResponse<Data>
 ) {
   const privateKey = new TextEncoder().encode(
-    process.env.NEXT_PUBLIC_JWT_SECRET,
+    process.env.NEXT_PUBLIC_JWT_SECRET
   )
   const alg = 'HS256'
   const token = await new jose.SignJWT({
@@ -63,7 +74,7 @@ async function generateJWT(
     firstName,
     lastName,
     nickname,
-    email,
+    email
   })
     .setProtectedHeader({ alg })
     .sign(privateKey)
