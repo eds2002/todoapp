@@ -12,9 +12,11 @@ export default function handler(
   res: NextApiResponse<Data>
 ) {
   try {
-    setCookie('userID', '', { req, res, maxAge: 0, path: '/' })
-    res.status(200).json({ code: 200, message: 'SUCCESS' })
+    res
+      .setHeader('Set-Cookie', 'userID=someValue; Max-Age=0; path=/')
+      .status(200)
+      .json({ code: 200, message: 'SUCCESS' })
   } catch (e) {
-    res.status(200).json({ code: 400, message: e as string })
+    res.status(400).json({ code: 400, message: e as string })
   }
 }
