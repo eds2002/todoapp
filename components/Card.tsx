@@ -22,7 +22,6 @@ async function getTodosCount(id: number) {
 async function deleteList(id: number) {
   try {
     const { status, error } = await supabase.from('list').delete().eq('id', id)
-    console.log(error)
     return [status, null]
   } catch (e) {
     return [null, e]
@@ -35,7 +34,7 @@ export default function Card({
   desc,
   id,
   created_at,
-  index,
+  index
 }: {
   className?: string
   name: string
@@ -126,7 +125,7 @@ export default function Card({
 function SettingsContainer({
   setState,
   id,
-  setEditList,
+  setEditList
 }: {
   setState: (val: boolean) => void
   id: number
@@ -138,7 +137,7 @@ function SettingsContainer({
       id: 'edit',
       name: 'Edit',
       icon: IoPencil,
-      onClick: () => setEditList(true),
+      onClick: () => setEditList(true)
     },
     {
       id: 'delete',
@@ -147,9 +146,7 @@ function SettingsContainer({
       onClick: async () => {
         const [status, error] = await deleteList(id)
         if (!error) {
-          console.log(status)
           const code = String(status).charAt(0)
-          console.log(code)
           switch (code) {
             case '2': {
               setLists((lists: iList[]) => lists.filter(list => list.id !== id))
@@ -162,8 +159,8 @@ function SettingsContainer({
             }
           }
         }
-      },
-    },
+      }
+    }
   ]
   return (
     <>
@@ -194,7 +191,7 @@ const itemVariant = {
   visible: (custom: number) => ({
     opacity: 1,
     transition: {
-      delay: custom * 0.01,
-    },
-  }),
+      delay: custom * 0.01
+    }
+  })
 }

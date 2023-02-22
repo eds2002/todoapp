@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { deleteCookie } from 'cookies-next'
+import { deleteCookie, setCookie, setCookies } from 'cookies-next'
 
 type Data = {
   code: number
@@ -12,7 +12,7 @@ export default function handler(
   res: NextApiResponse<Data>
 ) {
   try {
-    deleteCookie('userID', { req, res })
+    setCookie('userID', '', { req, res, maxAge: 0 })
     res.status(200).json({ code: 200, message: 'SUCCESS' })
   } catch (e) {
     res.status(200).json({ code: 400, message: e as string })
