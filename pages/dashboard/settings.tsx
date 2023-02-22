@@ -208,6 +208,7 @@ export default function settings() {
     const { code, message } = await fetch(`${origin}/api/logout`).then(res =>
       res.json()
     )
+    console.log(code, message)
 
     switch (code) {
       case 200: {
