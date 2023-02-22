@@ -205,9 +205,9 @@ export default function settings() {
 
   const handleLogout = async () => {
     const origin = window.location.origin
-    const { code, message } = await fetch(`${origin}/api/logout`).then(res =>
-      res.json()
-    )
+    const { code, message } = await fetch(`${origin}/api/logout`, {
+      method: 'POST'
+    }).then(res => res.json())
     console.log(code, message)
 
     switch (code) {
